@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Tp2 Objet Connectés</title>
+	<center>
+		<h1>Contrôle d'une porte d'aération d'une serre</h1>
+	</center>
+	<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+	
+	<table>
+		<tr><th>Informations</th></tr>
+		<tr><td>Température ambiante :</td></tr>
+		<tr><td>Distance :</td></tr>
+	</table>
+	&emsp;
+	<table>
+		<tr>
+			<th>Controle</th>
+		</tr>
+		<tr><td><button type="button"><p>Automatique</p></button></td></tr>
+		<tr>
+			<td><button type="button"><p>Manuelle</p></button></td>
+			<td><input type="number"></td>
+		</tr>
+		<tr>
+			<td><button type="button"><p>Ouvrir</p></button></td>
+			<td><button type="button"><p>Fermer</p></button></td>
+		</tr>
+	</table>
+	&emsp;
+	<table>
+		<tr><th>Progress</th></tr>
+		<tr><td><label for="file">Pourcentage d'ouverture de la porte: </label><progress id="file" max="100" value="40"> 40% </progress></td></tr>
+	</table>
+	&emsp;
+	<table>
+		<tr><th>Status</th></tr>
+		<tr><td><button type="button"><p >Graphique de températures et de pourcentages par période</p></button></td></tr>
+		<tr><td><p>Alerte : La porte est ouverte plus que nécessaire, elle doit être ouverte à : 33%</p></td></tr>
+	</table>
+</body>
+</html>
+
+
