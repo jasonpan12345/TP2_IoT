@@ -1,12 +1,24 @@
-var mysql = require('mysql');
-var conn = mysql.createConnection({
-  host: 'tp2-gestion-iot.database.windows.net', // Replace with your host name
-  user: 'jasonpan',      // Replace with your database username
-  password: 'tp2-gestion-admin',      // Replace with your database password
-  database: 'iot-gestion-tp2' // // Replace with your database Name
-}); 
-conn.connect(function(err) {
-  if (err) throw err;
-  console.log('Database is connected successfully !');
+var Connection = require('tedious').Connection;  
+var config = {  
+    server: 'tp2-gestion-iot.database.windows.net',  //update me
+    authentication: {
+        type: 'default',
+        options: {
+            userName: 'jasonpan', //update me
+            password: 'tp2-gestion-admin'  //update me
+        }
+    },
+    options: {
+        // If you are on Microsoft Azure, you need encryption:
+        encrypt: true,
+        database: 'iot-gestion-tp2'  //update me
+    }
+};  
+var connection = new Connection(config);  
+connection.on('connect', function(err) {  
+    // If no error, then good to proceed.
+    console.log("Connected");  
 });
-module.exports = conn;
+
+//connection.connect();
+module.exports = connection;
