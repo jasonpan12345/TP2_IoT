@@ -49,7 +49,7 @@
 			</tr>
 			<tr>
 				<td>Température ambiante :</td>
-				<td id="temp">hi</td>
+				<td id="temp"></td>
 			</tr>
 			<tr>
 				<td>Distance :</td>
@@ -124,8 +124,14 @@
 <script>
 	var socket = io();
 	socket.on("message", (arg) => {
-		console.log(arg); // world
+		console.log(arg); 
+
+		console.log(typeof arg);
+		updateDOM(arg);
 	});
+	function updateDOM(data){
+		document.getElementById("temp").innerHTML = data.temperature;
+	}
 </script>
 
 </html>

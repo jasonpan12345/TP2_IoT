@@ -6,7 +6,13 @@ var routes = require("./routes");
 var ejs = require('ejs');
 
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var io = require('socket.io')(http, {
+    perMessageDeflate :false,
+    cors: {
+        origin: '*',
+        methods: ['GET', 'POST'],
+    },
+});
 
 // load msg module and give it the io variable
 var db = require('./database')(io);
