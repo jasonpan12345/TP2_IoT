@@ -1,4 +1,9 @@
 var Connection = require('tedious').Connection;
+// define module constructor that accepts the io variable
+var io;
+module.exports = function(importIO) {
+    io = importIO;
+}
 var config = {
     server: 'tp2-gestion-iot.database.windows.net',  //update me
     authentication: {
@@ -58,7 +63,8 @@ function executeStatement() {
                 result += column.value + " ";
             }
         });*/
-        console.log(resultJson);
+        console.log(resultJson[0]);
+        io.emit('message', resultJson[0]);
         resultJson = [];
         row = {};
         result = "";
@@ -77,4 +83,4 @@ function executeStatement() {
 }
 
 
-module.exports = connection;
+//module.exports = connection;

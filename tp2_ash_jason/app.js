@@ -8,6 +8,9 @@ var ejs = require('ejs');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+// load msg module and give it the io variable
+var db = require('./database')(io);
+
 app.set("port", process.env.PORT || 3000);
 
 app.set("views", path.join(__dirname, "views"));
@@ -17,7 +20,6 @@ app.set("view engine", "ejs");
 
 io.on('connection', (socket) => {
     app.use(routes);
-    socket.emit('message', "message sent");
     console.log('a user connected');
 });
 
