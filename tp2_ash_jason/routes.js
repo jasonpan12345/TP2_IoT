@@ -7,8 +7,6 @@ var db = require('./database')
 router.get("/", function(req,res){
     console.log("Hello I'm on the start page here!");
 
-    db.connect();
-
     res.render("index");
 });
 
