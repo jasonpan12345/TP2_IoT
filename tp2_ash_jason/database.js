@@ -36,7 +36,7 @@ var TYPES = require('tedious').TYPES;
 
 function executeStatement() {
     // select latest data
-    request = new Request("SELECT TOP 1 * FROM [dbo].[test] ORDER BY time DESC;", function (err) {
+    request = new Request("SELECT TOP 1 * FROM [dbo].[infos] ORDER BY time DESC;", function (err) {
         if (err) {
             console.log(err);
         }
