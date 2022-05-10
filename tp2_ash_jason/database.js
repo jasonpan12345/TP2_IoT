@@ -4,6 +4,7 @@ var io;
 module.exports = function(importIO) {
     io = importIO;
 }
+
 var config = {
     server: 'tp2-gestion-iot.database.windows.net',  //update me
     authentication: {
@@ -22,9 +23,9 @@ var config = {
 var connection = new Connection(config);
 connection.on('connect', function (err) {
     // If no error, then good to proceed.
-    console.log("Connected");
+    console.log("Connected to database");
     setInterval(function () {
-        executeStatement(); //this code runs every 10 seconds
+        executeStatement(); //this code runs every 5 seconds
     }, 5000);
 
 });
@@ -63,7 +64,7 @@ function executeStatement() {
                 result += column.value + " ";
             }
         });*/
-        console.log(resultJson[0]);
+        //console.log(resultJson[0]);
         io.emit('message', resultJson[0]);
         resultJson = [];
         row = {};
@@ -77,7 +78,7 @@ function executeStatement() {
     // Close the connection after the final event emitted by the request, after the callback passes
     request.on("requestCompleted", function (rowCount, more) {
         //connection.close();
-        console.log("request done");
+        console.log("fetched database");
     });
     connection.execSql(request);
 }

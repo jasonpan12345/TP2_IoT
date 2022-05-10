@@ -86,21 +86,21 @@
 				<th>Controle</th>
 			</tr>
 			<tr>
-				<td><button type="button">
+				<td><button type="button" id="submitAuto">
 						<p>Automatique</p>
 					</button></td>
 			</tr>
 			<tr>
-				<td><button type="button">
+				<td><button type="button" id="submitMan">
 						<p>Manuelle</p>
 					</button></td>
 				<td><input type="number" id="manInput"></td>
 			</tr>
 			<tr>
-				<td><button type="button">
+				<td><button type="button" id="submitOpen">
 						<p>Ouvrir</p>
 					</button></td>
-				<td><button type="button">
+				<td><button type="button" id="submitClose">
 						<p>Fermer</p>
 					</button></td>
 			</tr>
@@ -147,13 +147,36 @@
 	socket.on("message", (arg) => {
 		console.log(arg);
 
-		console.log(typeof arg);
 		updateDOM(arg);
 	});
 	function updateDOM(data) {
 		document.getElementById("temp").innerHTML = data.temperature;
 		document.getElementById("dist").innerHTML = data.ouverture;
 	}
+	
+	document.getElementById('submitAuto').addEventListener('click', function() {
+    	var value = document.getElementById('manInput').value;
+		submitValues("auto");
+	}); 
+	document.getElementById('submitMan').addEventListener('click', function() {
+    	var value = document.getElementById('manInput').value;
+		if(value > 100){
+			value = 100;
+		}
+		submitValues(value);
+	}); 
+	document.getElementById('submitOpen').addEventListener('click', function() {
+    	submitValues(100);
+	}); 
+	document.getElementById('submitClose').addEventListener('click', function() {
+    	submitValues(0);
+	}); 
+
+	function submitValues(value){
+		socket.emit('submitValues', value);
+		console.log("value: " + value);
+	}
+
 </script>
 
 </html>

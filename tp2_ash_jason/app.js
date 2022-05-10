@@ -7,7 +7,7 @@ var ejs = require('ejs');
 
 var http = require('http').Server(app);
 var io = require('socket.io')(http, {
-    perMessageDeflate :false,
+    perMessageDeflate: false,
     cors: {
         origin: '*',
         methods: ['GET', 'POST'],
@@ -25,9 +25,15 @@ app.set("view engine", "ejs");
 app.use(routes);
 
 io.on('connection', (socket) => {
-    
+
     console.log('a user connected');
+    // receive values from client
+    socket.on('submitValues', function (data) {
+        console.log("server received: " + data);
+        require('./send_data')(data);
+    });
 });
+
 
 http.listen(app.get("port"), function () {
     console.log("Server starter on port " + app.get("port"))
