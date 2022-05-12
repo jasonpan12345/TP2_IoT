@@ -56,6 +56,9 @@
 			width: 300px;
 			color: white;
 		}
+		#alerte{
+			color: red;
+		}
 	</style>
 </head>
 
@@ -70,10 +73,6 @@
 			<tr>
 				<td>Température ambiante :</td>
 				<td id="temp"></td>
-			</tr>
-			<tr>
-				<td>Distance :</td>
-				<td id="dist"></td>
 			</tr>
 		</table>
 	</div>
@@ -115,7 +114,12 @@
 				<th>Progress</th>
 			</tr>
 			<tr>
-				<td><label for="file">Pourcentage d'ouverture de la porte: </label><progress id="file" max="100"
+				<td>Pourcentage d'ouverture :</td>
+					<td id="dist"></td>
+			</tr>
+			<tr>
+					
+				<td><progress id="file" max="100"
 						value="40" max="100"> 40% </progress></td>
 			</tr>
 		</table>
@@ -135,7 +139,7 @@
 			</tr>
 			<tr>
 				<td>
-					<p>Alerte : La porte est ouverte plus que nécessaire, elle doit être ouverte à : 33%</p>
+					<p id="alerte"></p>
 				</td>
 			</tr>
 		</table>
@@ -150,8 +154,29 @@
 		updateDOM(arg);
 	});
 	function updateDOM(data) {
-		document.getElementById("temp").innerHTML = data.temperature;
-		document.getElementById("dist").innerHTML = data.ouverture;
+		var pct_goal = parseInt((data.temperature-20)/15); //pourcentage en mode automatique
+
+		document.getElementById("temp").innerHTML = data.temperature + "°C"; 
+		document.getElementById("dist").innerHTML = data.ouverture + "%";
+		document.getElementById("file").value = data.ouverture;
+		
+		//changer couleur des boutons selon mode
+		if(data.controleauto == 1){
+			document.getElementById("submitAuto").style.border = "2px solid green";
+			document.getElementById("submitMan").style.border = "2px solid black";
+
+			if(data.ouverture != pct_goal){
+				document.getElementById("alerte").innerHTML = "Alerte: Il y a une déviation dans l'ouverture, elle doit être ouverte à " + pct_goal +" %";
+			}
+			else{
+				document.getElementById("alerte").innerHTML = "";
+			}
+		}
+		else{
+			document.getElementById("submitMan").style.border = "2px solid green";
+			document.getElementById("submitAuto").style.border = "2px solid black";
+			document.getElementById("alerte").innerHTML = "";
+		}
 	}
 	
 	document.getElementById('submitAuto').addEventListener('click', function() {
@@ -173,8 +198,10 @@
 	}); 
 
 	function submitValues(value){
-		socket.emit('submitValues', value);
-		console.log("value: " + value);
+		if(value.length > 0){
+			socket.emit('submitValues', value);
+			console.log("value: " + value);
+		}
 	}
 
 </script>

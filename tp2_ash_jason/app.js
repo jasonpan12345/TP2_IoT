@@ -14,7 +14,6 @@ var io = require('socket.io')(http, {
     },
 });
 
-// load msg module and give it the io variable
 var db = require('./database')(io);
 
 app.set("port", process.env.PORT || 3000);
@@ -27,7 +26,7 @@ app.use(routes);
 io.on('connection', (socket) => {
 
     console.log('a user connected');
-    // receive values from client
+    // recoit data du client
     socket.on('submitValues', function (data) {
         console.log("server received: " + data);
         require('./send_data')(data);
