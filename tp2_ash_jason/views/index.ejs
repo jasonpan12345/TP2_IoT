@@ -29,12 +29,13 @@
 			color: white;
 		}
 
-		#manInput{
-			width:50px;
-			height:40px;
+		#manInput {
+			width: 50px;
+			height: 40px;
 		}
-		button{
-			width:100%;
+
+		button {
+			width: 100%;
 			min-width: 100px;
 			border-radius: 10px;
 		}
@@ -56,8 +57,19 @@
 			width: 300px;
 			color: white;
 		}
-		#alerte{
+
+		#alerte {
 			color: red;
+		}
+
+		.graph {
+			border: 1px solid black;
+			display: none;
+			width: 100%;
+			max-width: 1200px;
+			max-height: 900px;
+			float: right;
+			margin-right: 100px;
 		}
 	</style>
 </head>
@@ -65,87 +77,90 @@
 <body>
 	&emsp;
 
-	<div class="divInformations">
-		<table>
-			<tr>
-				<th>Informations</th>
-			</tr>
-			<tr>
-				<td>Température ambiante :</td>
-				<td id="temp"></td>
-			</tr>
-		</table>
-	</div>
+	<div style="width:320px; display: inline-block;">
+		<div class="divInformations">
+			<table>
+				<tr>
+					<th>Informations</th>
+				</tr>
+				<tr>
+					<td>Température ambiante :</td>
+					<td id="temp"></td>
+				</tr>
+			</table>
+		</div>
 
-	&emsp;
+		&emsp;
 
-	<div class="divControle">
-		<table>
-			<tr>
-				<th>Controle</th>
-			</tr>
-			<tr>
-				<td><button type="button" id="submitAuto">
-						<p>Automatique</p>
-					</button></td>
-			</tr>
-			<tr>
-				<td><button type="button" id="submitMan">
-						<p>Manuelle</p>
-					</button></td>
-				<td><input type="number" id="manInput"></td>
-			</tr>
-			<tr>
-				<td><button type="button" id="submitOpen">
-						<p>Ouvrir</p>
-					</button></td>
-				<td><button type="button" id="submitClose">
-						<p>Fermer</p>
-					</button></td>
-			</tr>
-		</table>
-	</div>
+		<div class="divControle">
+			<table>
+				<tr>
+					<th>Controle</th>
+				</tr>
+				<tr>
+					<td><button type="button" id="submitAuto">
+							<p>Automatique</p>
+						</button></td>
+				</tr>
+				<tr>
+					<td><button type="button" id="submitMan">
+							<p>Manuelle</p>
+						</button></td>
+					<td><input type="number" id="manInput"></td>
+				</tr>
+				<tr>
+					<td><button type="button" id="submitOpen">
+							<p>Ouvrir</p>
+						</button></td>
+					<td><button type="button" id="submitClose">
+							<p>Fermer</p>
+						</button></td>
+				</tr>
+			</table>
+		</div>
 
-	&emsp;
+		&emsp;
 
-	<div class="divProgress">
-		<table>
-			<tr>
-				<th>Progress</th>
-			</tr>
-			<tr>
-				<td>Pourcentage d'ouverture :</td>
+		<div class="divProgress">
+			<table>
+				<tr>
+					<th>Progress</th>
+				</tr>
+				<tr>
+					<td>Pourcentage d'ouverture :</td>
 					<td id="dist"></td>
-			</tr>
-			<tr>
-					
-				<td><progress id="file" max="100"
-						value="40" max="100"> 40% </progress></td>
-			</tr>
-		</table>
-	</div>
+				</tr>
+				<tr>
 
-	&emsp;
+					<td><progress id="file" max="100" value="40" max="100"> 40% </progress></td>
+				</tr>
+			</table>
+		</div>
 
-	<div class="divStatus">
-		<table>
-			<tr>
-				<th>Status</th>
-			</tr>
-			<tr>
-				<td><button type="button">
-						<p>Graphique de températures et de pourcentages par période</p>
-					</button></td>
-			</tr>
-			<tr>
-				<td>
-					<p id="alerte"></p>
-				</td>
-			</tr>
-		</table>
+		&emsp;
+
+		<div class="divStatus">
+			<table>
+				<tr>
+					<th>Status</th>
+				</tr>
+				<tr>
+					<td><button id="graphBtn" type="button">
+							<p>Graphique de températures et de pourcentages par période</p>
+						</button></td>
+				</tr>
+				<tr>
+					<td>
+						<p id="alerte"></p>
+					</td>
+				</tr>
+			</table>
+		</div>
 	</div>
+	<canvas id="graph1" class="graph"></canvas>
 </body>
 <script src="/socket.io/socket.io.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 <script>
 	var socket = io();
 	socket.on("message", (arg) => {
@@ -153,55 +168,128 @@
 
 		updateDOM(arg);
 	});
+	socket.on("graphData", (arg) => {
+		console.log("graph data received");
+		drawGraph(arg);
+	});
 	function updateDOM(data) {
-		var pct_goal = parseInt((data.temperature-20)/15); //pourcentage en mode automatique
+		var pct_goal = parseInt((data.temperature - 20) / 15); //pourcentage en mode automatique
 
-		document.getElementById("temp").innerHTML = data.temperature + "°C"; 
+		document.getElementById("temp").innerHTML = data.temperature + "°C";
 		document.getElementById("dist").innerHTML = data.ouverture + "%";
 		document.getElementById("file").value = data.ouverture;
-		
+
 		//changer couleur des boutons selon mode
-		if(data.controleauto == 1){
+		if (data.controleauto == 1) {
 			document.getElementById("submitAuto").style.border = "2px solid green";
 			document.getElementById("submitMan").style.border = "2px solid black";
 
-			if(data.ouverture != pct_goal){
-				document.getElementById("alerte").innerHTML = "Alerte: Il y a une déviation dans l'ouverture, elle doit être ouverte à " + pct_goal +" %";
+			if (data.ouverture != pct_goal) {
+				document.getElementById("alerte").innerHTML = "Alerte: Il y a une déviation dans l'ouverture, elle doit être ouverte à " + pct_goal + " %";
 			}
-			else{
+			else {
 				document.getElementById("alerte").innerHTML = "";
 			}
 		}
-		else{
+		else {
 			document.getElementById("submitMan").style.border = "2px solid green";
 			document.getElementById("submitAuto").style.border = "2px solid black";
 			document.getElementById("alerte").innerHTML = "";
 		}
 	}
-	
-	document.getElementById('submitAuto').addEventListener('click', function() {
-    	var value = document.getElementById('manInput').value;
+
+	document.getElementById('submitAuto').addEventListener('click', function () {
+		var value = document.getElementById('manInput').value;
 		submitValues("auto");
-	}); 
-	document.getElementById('submitMan').addEventListener('click', function() {
-    	var value = document.getElementById('manInput').value;
-		if(value > 100){
+	});
+	document.getElementById('submitMan').addEventListener('click', function () {
+		var value = document.getElementById('manInput').value;
+		if (value > 100) {
 			value = 100;
 		}
 		submitValues(value);
-	}); 
-	document.getElementById('submitOpen').addEventListener('click', function() {
-    	submitValues(100);
-	}); 
-	document.getElementById('submitClose').addEventListener('click', function() {
-    	submitValues(0);
-	}); 
+	});
+	document.getElementById('submitOpen').addEventListener('click', function () {
+		submitValues(100);
+	});
+	document.getElementById('submitClose').addEventListener('click', function () {
+		submitValues(0);
+	});
+	document.getElementById('graphBtn').addEventListener('click', function () {
+		socket.emit("requestData");
+	});
 
-	function submitValues(value){
-		if(value.length > 0){
+	function submitValues(value) {
+		if (value.length > 0) {
 			socket.emit('submitValues', value);
 			console.log("value: " + value);
 		}
+	}
+
+	function drawGraph(data) {
+		var timeValues = [];
+		var tempValues = [];
+		var ouvertureValues = [];
+		
+		for(let i = data.length-1; i >= 0; i--){
+			timeValues.push(data[i]["time"])
+			ouvertureValues.push(data[i]["ouverture"])
+			tempValues.push(data[i]["temperature"])
+		}
+
+		//var xValues = ["2022-12-05T14:48:29.000Z", "2022-12-05T14:47:28.000Z", "2022-11-05T14:34:17.000Z", "2022-11-05T14:33:15.000Z"];
+
+		new Chart("graph1", {
+			type: "line",
+			data: {
+				labels: timeValues,
+				datasets: [{
+					label: 'Temperature',
+					yAxisID: 'T',
+					data: tempValues,
+					borderColor: "red",
+					fill: false
+				}, {
+					label: 'Ouverture',
+					yAxisID: 'O',
+					data: ouvertureValues,
+					borderColor: "green",
+					fill: false
+				}]
+			},
+			options: {
+				legend: { display: true },
+				scales: {
+					timeValues: [{
+						type: 'time',
+						ticks: {
+							maxRotation: 90,
+							minRotation: 45,
+							autoSkip: false,
+						}
+					}],
+					yAxes: [{
+						id: 'T',
+						type: 'linear',
+						position: 'left',
+						ticks: {
+							max: 35,
+							min: 0
+						}
+					}, {
+						id: 'O',
+						type: 'linear',
+						position: 'right',
+						ticks: {
+							max: 100,
+							min: 0
+						}
+					}]
+				}
+			}
+		});
+
+		document.getElementById("graph1").style.display = "inline-block";
 	}
 
 </script>

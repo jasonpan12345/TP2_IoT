@@ -1,8 +1,41 @@
 var Connection = require('tedious').Connection;
 
 var io;
-module.exports = function(importIO) {
+module.exports = function(importIO, action) {
     io = importIO;
+
+    // demande data pour le graphe
+    if(action == "requestData"){
+        console.log("requested");
+
+        query = "SELECT TOP 10 temperature, ouverture, time FROM(SELECT temperature, ouverture, time, ROW_NUMBER() OVER (ORDER BY time) AS rownum FROM [dbo].[infos]) AS t WHERE t.rownum % 12 = 0 ORDER BY time DESC"
+
+        // cherche donnees de chaque minute
+        request = new Request(query, function (err) {
+            if (err) {
+                console.log(err);
+            }
+        });
+        var resultJson = [];
+    
+        request.on('row', function (columns) {
+    
+            var row = {};
+            columns.forEach(function (column) {
+                if (column.isNull) {
+                    row[column.metadata.colName] = null;
+                } else {
+                    row[column.metadata.colName] = column.value;
+                }
+            });
+            resultJson.push(row);
+        });
+        request.on("requestCompleted", function () {
+            io.emit('graphData', resultJson);
+        });
+
+        connection.execSql(request);
+    }
 }
 
 var config = {
@@ -42,8 +75,7 @@ function executeStatement() {
             console.log(err);
         }
     });
-    var result = "";
-    var resultJson = []
+    var resultJson = [];
 
     request.on('row', function (columns) {
 
@@ -60,7 +92,6 @@ function executeStatement() {
         io.emit('message', resultJson[0]);
         resultJson = [];
         row = {};
-        result = "";
     });
 
     request.on('done', function (rowCount, more) {

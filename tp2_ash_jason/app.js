@@ -14,7 +14,7 @@ var io = require('socket.io')(http, {
     },
 });
 
-var db = require('./database')(io);
+var db = require('./database')(io, "");
 
 app.set("port", process.env.PORT || 3000);
 
@@ -30,6 +30,10 @@ io.on('connection', (socket) => {
     socket.on('submitValues', function (data) {
         console.log("server received: " + data);
         require('./send_data')(data);
+    });
+    // demande data pour le graphique
+    socket.on('requestData', function (data) {
+        require('./database')(io, "requestData");
     });
 });
 
