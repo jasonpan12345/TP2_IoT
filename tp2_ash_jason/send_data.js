@@ -17,7 +17,7 @@ module.exports = function (data) {
     responseTimeoutInSeconds: 30
   };
 
-  // Appelle direct method du device
+  // Appelle direct method de l'appareil
   client.invokeDeviceMethod(deviceId, methodParams, function (err, result) {
     if (err) {
       console.error('Failed to invoke method \'' + methodParams.methodName + '\': ' + err.message);
